@@ -6,7 +6,12 @@ import io
 
 # Configuração da API (Vamos configurar a chave com segurança depois)
 if "GOOGLE_API_KEY" in st.secrets:
+
+    # Use exatamente este formato:
     genai.configure(api_key=st.secrets["GOOGLE_API_KEY"])
+
+    # Tente este modelo específico que é o mais compatível:
+    model = genai.GenerativeModel('gemini-1.5-flash-latest')
 else:
     st.error("Configure sua GOOGLE_API_KEY nos Secrets do Streamlit!")
 
@@ -55,4 +60,5 @@ with tab2:
     st.write("### 📋 Agenda Atual")
     for item in st.session_state.agenda:
         st.write(f"✅ {item['nome']} - {item['servico']}")
+
 
