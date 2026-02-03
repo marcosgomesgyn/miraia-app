@@ -15,7 +15,7 @@ st.markdown("""
 if 'agenda' not in st.session_state:
     st.session_state.agenda = []
 
-st.title("✨ MiraIA Estética")
+st.title("✨ MiraIA Estética V2")
 
 tab1, tab2 = st.tabs(["Agendar", "Painel Admin"])
 
@@ -44,3 +44,4 @@ with tab2:
     st.write("### 📋 Agenda")
     for item in st.session_state.agenda:
         st.write(f"**{item['hora']}** - {item['nome']} ({item['servico']})")
+
