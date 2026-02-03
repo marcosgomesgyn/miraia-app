@@ -7,11 +7,13 @@ import google.generativeai as genai
 # Forçamos a conexão com a versão estável para evitar o erro 404
 if "GOOGLE_API_KEY" in st.secrets:
     genai.configure(api_key=st.secrets["GOOGLE_API_KEY"])
+    # Adicione isso temporariamente para ver o que sua chave enxerga:
+    # st.write(genai.list_models())
 else:
     st.error("Configure sua GOOGLE_API_KEY nos Secrets do Streamlit!")
 
 # Definimos o modelo uma única vez aqui no topo
-MODELO_ESTAVEL = 'gemini-1.5-flash'
+MODELO_ESTAVEL = 'gemini-1.5-pro'
 
 st.set_page_config(page_title="MiraIA - Agendamento", page_icon="📅", layout="centered")
 
@@ -58,10 +60,9 @@ with tab2:
         
         with st.spinner("IA interpretando sua voz..."):
             try:
-                # Chamada da IA usando o modelo configurado no topo
+                # Agora sim, usando a variável que criamos no topo!
                 model = genai.GenerativeModel(MODELO_ESTAVEL)
                 
-                # Preparamos o conteúdo (instrução + áudio)
                 prompt = "Você é um assistente de recepção. Extraia Nome, Serviço e Data deste áudio. Responda APENAS no formato: Nome: [nome], Serviço: [servico], Data: [data]"
                 
                 audio_data = {
@@ -69,15 +70,15 @@ with tab2:
                     "data": audio['bytes']
                 }
                 
+                # O comando abaixo agora usa o modelo da variável lá de cima
                 response = model.generate_content([prompt, audio_data])
                 
-                # Exibe o que a IA entendeu
                 st.info(f"✅ Resultado da IA:\n{response.text}")
                 
             except Exception as e:
                 st.error(f"Erro na IA: {e}")
-                st.warning("Dica: Verifique se sua chave tem permissão para o Gemini 1.5 Flash.")
 
+                
     st.divider()
     st.write("### 📋 Agenda de Hoje")
     if not st.session_state.agenda:
@@ -85,3 +86,4 @@ with tab2:
     else:
         for item in st.session_state.agenda:
             st.write(f"🔹 **{item['nome']}** - {item['servico']} ({item['data']})")
+
