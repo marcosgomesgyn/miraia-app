@@ -13,7 +13,7 @@ else:
     st.error("Configure sua GOOGLE_API_KEY nos Secrets do Streamlit!")
 
 # Definimos o modelo uma única vez aqui no topo
-MODELO_ESTAVEL = 'gemini-2.0-flash-exp'
+MODELO_ESTAVEL = 'gemini-1.5-flash'
 
 st.set_page_config(page_title="MiraIA - Agendamento", page_icon="📅", layout="centered")
 
@@ -86,5 +86,6 @@ with tab2:
     else:
         for item in st.session_state.agenda:
             st.write(f"🔹 **{item['nome']}** - {item['servico']} ({item['data']})")
+
 
 
