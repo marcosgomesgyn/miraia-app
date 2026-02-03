@@ -39,7 +39,7 @@ with tab2:
         with st.spinner("Interpretando comando..."):
             try:
                 # O Cérebro: Enviando áudio para o Gemini
-                model = genai.GenerativeModel('gemini-1.5-flash')
+                model = genai.GenerativeModel('models/gemini-1.5-flash')
                 contents = [
                     "Você é um assistente de recepção. Extraia Nome, Serviço e Data deste áudio. Responda APENAS no formato: Nome: [nome], Serviço: [servico], Data: [data]",
                     {"mime_type": "audio/wav", "data": audio['bytes']}
@@ -55,3 +55,4 @@ with tab2:
     st.write("### 📋 Agenda Atual")
     for item in st.session_state.agenda:
         st.write(f"✅ {item['nome']} - {item['servico']}")
+
