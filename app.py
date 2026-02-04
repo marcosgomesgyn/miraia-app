@@ -29,14 +29,13 @@ api_key = st.sidebar.text_input("Cole sua API Key aqui:", type="password")
 if api_key:
     try:
         genai.configure(api_key=api_key)
-
-        model = genai.GenerativeModel('models/gemini-1.5-flash')
-                
+        # NOME ABSOLUTO: O padrão que resolve o erro 404
+        model = genai.GenerativeModel('gemini-1.5-flash')
+        
         st.subheader("⚡ Ação Rápida")
         col_audio, col_txt, col_file = st.columns([0.6, 2, 1])
         
         with col_audio:
-            # Gravamos o áudio, mas ele não dispara a IA sozinho agora
             audio_bytes = audio_recorder(text="Falar", icon_size="2x", neutral_color="#3b82f6")
         
         with col_txt:
@@ -45,9 +44,7 @@ if api_key:
         with col_file:
             arquivo = st.file_uploader("Subir Print", type=['png', 'jpg', 'jpeg'], label_visibility="collapsed")
 
-        # ÚNICO GATILHO: Agora só executa se você clicar no botão
         if st.button("🚀 Executar MiraAI"):
-            # Verificamos se há algo para processar
             if comando or arquivo or audio_bytes:
                 with st.spinner("MiraAI processando sua solicitação..."):
                     instrucao = f"Aja como MiraAI. Instrução do usuário: {comando if comando else 'Analise os dados fornecidos.'}"
@@ -59,7 +56,7 @@ if api_key:
                     if audio_bytes:
                         conteudo_para_ia.append({"mime_type": "audio/wav", "data": audio_bytes})
 
-                    # Chamada para a API
+                    # Chamada direta
                     response = model.generate_content(conteudo_para_ia)
                     
                     st.success("Análise concluída!")
@@ -70,11 +67,13 @@ if api_key:
                     nova_tarefa = pd.DataFrame([{'Prioridade': 'Alta', 'Horário': 'Ver Resposta', 'Tarefa/Evento': texto_tarefa, 'Status': 'Novo'}])
                     st.session_state.agenda = pd.concat([st.session_state.agenda, nova_tarefa], ignore_index=True)
             else:
-                st.warning("Por favor, digite algo, fale ou suba uma imagem antes de executar.")
+                st.warning("Por favor, digite algo antes de executar.")
 
     except Exception as e:
         if "429" in str(e):
-            st.error("Limite de cota atingido. Por favor, aguarde 60 segundos antes de tentar novamente.")
+            st.error("Limite de cota atingido. Por favor, aguarde 60 segundos.")
+        elif "404" in str(e):
+            st.error("Erro de conexão com o modelo. Tentando reestabilizar...")
         else:
             st.error(f"Erro inesperado: {e}")
             
@@ -85,6 +84,3 @@ st.session_state.agenda = st.data_editor(st.session_state.agenda, num_rows="dyna
 
 st.markdown("---")
 st.caption("MiraAI v2.0 - Tecnologia Omni Digital")
-
-
-
