@@ -33,7 +33,8 @@ if api_key:
         
         # MUDANÇA CRÍTICA: Chamamos o modelo sem o prefixo 'models/' 
         # para forçar a biblioteca a achar a rota certa.
-        model = genai.GenerativeModel('gemini-1.5-flash')
+        
+        model = genai.GenerativeModel('gemini-2.0-flash')
         
         st.subheader("🎤 O que o Omni deve fazer?")
         comando = st.text_input("Comando:", value="Agendar live no Instagram quarta às 19h")
@@ -70,3 +71,4 @@ if api_key:
 st.divider()
 st.subheader("📅 Agenda de Hoje")
 st.session_state.agenda = st.data_editor(st.session_state.agenda, num_rows="dynamic", use_container_width=True)
+
