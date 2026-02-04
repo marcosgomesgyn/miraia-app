@@ -29,9 +29,9 @@ api_key = st.sidebar.text_input("Cole sua API Key aqui:", type="password")
 if api_key:
     try:
         genai.configure(api_key=api_key)
-        
-        model = genai.GenerativeModel('gemini-1.5-flash-latest')
-        
+
+        model = genai.GenerativeModel('models/gemini-1.5-flash')
+                
         st.subheader("⚡ Ação Rápida")
         col_audio, col_txt, col_file = st.columns([0.6, 2, 1])
         
@@ -85,5 +85,6 @@ st.session_state.agenda = st.data_editor(st.session_state.agenda, num_rows="dyna
 
 st.markdown("---")
 st.caption("MiraAI v2.0 - Tecnologia Omni Digital")
+
 
 
