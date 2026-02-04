@@ -77,10 +77,10 @@ if api_key:
 
     except Exception as e:
         if "429" in str(e):
-            st.warning("⚠️ O Google pediu um tempo (Limite de Cota). Aguarde 60 segundos e tente o próximo comando. [cite: 2026-02-04]")
+            st.error("Limite de cota atingido. Por favor, aguarde 60 segundos antes de tentar novamente.")
         else:
-            st.error(f"Erro na conexão: {e}")
-
+            st.error(f"Erro inesperado: {e}")
+            
 # 4. DASHBOARD DE AGENDA
 st.divider()
 st.subheader("📅 Sua Jornada de Hoje")
@@ -88,3 +88,4 @@ st.session_state.agenda = st.data_editor(st.session_state.agenda, num_rows="dyna
 
 st.markdown("---")
 st.caption("MiraAI v2.0 - Tecnologia Omni Digital")
+
