@@ -3,13 +3,15 @@ import datetime
 from streamlit_mic_recorder import mic_recorder
 import google.generativeai as genai
 
-# Forçamos a conexão com a versão estável
+# 1. Configuração de Estabilidade da API - FORÇANDO V1
 if "GOOGLE_API_KEY" in st.secrets:
-    genai.configure(api_key=st.secrets["GOOGLE_API_KEY"])
+    # Esta linha abaixo é o segredo: ela força a API a sair da v1beta
+    genai.configure(api_key=st.secrets["GOOGLE_API_KEY"], transport='rest')
 else:
     st.error("Configure sua GOOGLE_API_KEY nos Secrets do Streamlit!")
 
-# Definimos o modelo estável
+# Definimos o modelo exatamente como apareceu no seu DEBUG
+
 MODELO_ESTAVEL = 'models/gemini-1.5-flash'
 
 st.set_page_config(page_title="MiraIA - Agendamento", page_icon="📅", layout="centered")
@@ -82,5 +84,6 @@ if not st.session_state.agenda:
 else:
     for item in st.session_state.agenda:
         st.write(f"🔹 **{item['nome']}** - {item['servico']} ({item['data']})")
+
 
 
