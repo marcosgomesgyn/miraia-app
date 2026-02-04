@@ -60,6 +60,13 @@ with tab2:
         
         with st.spinner("IA interpretando sua voz..."):
             try:
+
+models = [m.name for m in genai.list_models()]
+    st.write(f"Modelos que sua chave enxerga: {models}")
+except Exception as e:
+    st.error(f"Sua chave ainda está bloqueada: {e}")
+
+                
                 # Agora sim, usando a variável que criamos no topo!
                 model = genai.GenerativeModel(MODELO_ESTAVEL)
                 
@@ -86,6 +93,7 @@ with tab2:
     else:
         for item in st.session_state.agenda:
             st.write(f"🔹 **{item['nome']}** - {item['servico']} ({item['data']})")
+
 
 
 
