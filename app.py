@@ -3,21 +3,17 @@ import datetime
 from streamlit_mic_recorder import mic_recorder
 import google.generativeai as genai
 
-# 1. Configuração de Estabilidade da API
-# Forçamos a conexão com a versão estável para evitar o erro 404
+# Forçamos a conexão com a versão estável
 if "GOOGLE_API_KEY" in st.secrets:
     genai.configure(api_key=st.secrets["GOOGLE_API_KEY"])
-    # Adicione isso temporariamente para ver o que sua chave enxerga:
-    # st.write(genai.list_models())
 else:
     st.error("Configure sua GOOGLE_API_KEY nos Secrets do Streamlit!")
 
-# Definimos o modelo uma única vez aqui no topo
+# Definimos o modelo estável
 MODELO_ESTAVEL = 'gemini-1.5-flash'
 
 st.set_page_config(page_title="MiraIA - Agendamento", page_icon="📅", layout="centered")
 
-# Inicializa a agenda se não existir
 if 'agenda' not in st.session_state:
     st.session_state.agenda = []
 
@@ -47,7 +43,7 @@ with tab2:
     st.subheader("🎙️ Comando de Voz Inteligente")
     st.write("Diga algo como: 'Agendar Manicure para Julia amanhã'")
     
-    # Componente de gravação
+    # 1. BOTÃO DE GRAVAÇÃO
     audio = mic_recorder(
         start_prompt="Clique para Falar", 
         stop_prompt="Parar e Processar", 
@@ -55,19 +51,15 @@ with tab2:
     )
     
     if audio:
-        # Mostra o player para você conferir se o som ficou bom
         st.audio(audio['bytes'])
         
         with st.spinner("IA interpretando sua voz..."):
             try:
-
-models = [m.name for m in genai.list_models()]
-    st.write(f"Modelos que sua chave enxerga: {models}")
-except Exception as e:
-    st.error(f"Sua chave ainda está bloqueada: {e}")
-
+                # 2. DIAGNÓSTICO: Mostra o que a chave realmente alcança
+                modelos_disponiveis = [m.name for m in genai.list_models()]
+                st.write(f"DEBUG - Sua chave enxerga: {modelos_disponiveis}")
                 
-                # Agora sim, usando a variável que criamos no topo!
+                # 3. CHAMADA DA IA
                 model = genai.GenerativeModel(MODELO_ESTAVEL)
                 
                 prompt = "Você é um assistente de recepção. Extraia Nome, Serviço e Data deste áudio. Responda APENAS no formato: Nome: [nome], Serviço: [servico], Data: [data]"
@@ -77,23 +69,16 @@ except Exception as e:
                     "data": audio['bytes']
                 }
                 
-                # O comando abaixo agora usa o modelo da variável lá de cima
                 response = model.generate_content([prompt, audio_data])
-                
                 st.info(f"✅ Resultado da IA:\n{response.text}")
                 
             except Exception as e:
-                st.error(f"Erro na IA: {e}")
+                st.error(f"Erro detalhado: {e}")
 
-                
-    st.divider()
-    st.write("### 📋 Agenda de Hoje")
-    if not st.session_state.agenda:
-        st.write("Nenhum agendamento para hoje.")
-    else:
-        for item in st.session_state.agenda:
-            st.write(f"🔹 **{item['nome']}** - {item['servico']} ({item['data']})")
-
-
-
-
+st.divider()
+st.write("### 📋 Agenda de Hoje")
+if not st.session_state.agenda:
+    st.write("Nenhum agendamento para hoje.")
+else:
+    for item in st.session_state.agenda:
+        st.write(f"🔹 **{item['nome']}** - {item['servico']} ({item['data']})")
