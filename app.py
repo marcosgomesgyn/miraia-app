@@ -83,3 +83,4 @@ else:
     for item in st.session_state.agenda:
         st.write(f"🔹 **{item['nome']}** - {item['servico']} ({item['data']})")
 
+
