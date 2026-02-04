@@ -2,12 +2,11 @@ import streamlit as st
 import google.generativeai as genai
 from PIL import Image
 import pandas as pd
-from audio_recorder_streamlit import audio_recorder # Importação no topo [cite: 2026-02-04]
+from audio_recorder_streamlit import audio_recorder
 
 # 1. CONFIGURAÇÃO DE DESIGN EXTRAORDINÁRIO
 st.set_page_config(page_title="MiraAI - Gestão Inteligente", layout="wide", initial_sidebar_state="expanded")
 
-# CSS High-Tech [cite: 2026-02-04]
 st.markdown("""
     <style>
     .stApp { background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%); color: #f8fafc; }
@@ -32,28 +31,25 @@ with col_tit1:
     st.write("# 🤖")
 with col_tit2:
     st.title("MiraAI")
-    st.caption("Seu Assistente Multimodal de Alta Performance [cite: 2026-02-04]")
+    st.caption("Seu Assistente Multimodal de Alta Performance")
 
 # 4. BARRA LATERAL
 st.sidebar.image("https://cdn-icons-png.flaticon.com/512/4712/4712035.png", width=100)
 st.sidebar.title("Configurações")
 api_key = st.sidebar.text_input("Conectar com Google Cloud (API Key):", type="password")
 
-# 5. CORPO DO APP (AÇÃO RÁPIDA)
+# 5. CORPO DO APP
 if api_key:
     try:
         genai.configure(api_key=api_key)
-        model = genai.GenerativeModel('gemini-2.0-flash') # Motor 2.0 [cite: 2026-02-04]
+        model = genai.GenerativeModel('gemini-2.0-flash')
         
         container_comando = st.container()
         with container_comando:
             st.subheader("⚡ Ação Rápida")
-            
-            # Layout de 3 colunas para incluir o MICROFONE [cite: 2026-02-04]
             col_audio, col_txt, col_file = st.columns([0.5, 2, 1])
             
             with col_audio:
-                # O botão de voz neon [cite: 2026-02-04]
                 audio_bytes = audio_recorder(text="", icon_size="2x", neutral_color="#3b82f6")
             
             with col_txt:
@@ -64,10 +60,11 @@ if api_key:
 
             if st.button("Executar com Gemini 2.0") or audio_bytes:
                 with st.spinner("Processando inteligência..."):
-                    conteudo = [f"Aja como Vozia/MiraAI. Usuário quer: {comando}"]
+                    texto_final = comando if comando else "Comando de voz recebido"
+                    conteudo = [f"Aja como Vozia/MiraAI. Usuário quer: {texto_final}"]
                     
                     if audio_bytes:
-                        conteudo.append({"mime_type": "audio/wav", "data": audio_bytes}) [cite: 2026-02-04]
+                        conteudo.append({"mime_type": "audio/wav", "data": audio_bytes})
                     if arquivo:
                         conteudo.append(Image.open(arquivo))
                     
@@ -75,13 +72,12 @@ if api_key:
                     st.success("Comando Processado!")
                     st.info(response.text)
                     
-                    # Inserção na agenda
-                    nova_linha = pd.DataFrame([{'Prioridade': 'Alta', 'Horário': 'A confirmar', 'Tarefa/Evento': comando if comando else "Comando de Voz", 'Status': 'Pendente'}])
+                    nova_linha = pd.DataFrame([{'Prioridade': 'Alta', 'Horário': 'A confirmar', 'Tarefa/Evento': texto_final, 'Status': 'Pendente'}])
                     st.session_state.agenda = pd.concat([st.session_state.agenda, nova_linha], ignore_index=True)
 
     except Exception as e:
         if "429" in str(e):
-            st.warning("⚠️ O Google está respirando... Tente novamente em 30 segundos. [cite: 2026-02-04]")
+            st.warning("⚠️ O Google está respirando... Tente novamente em 30 segundos.")
         else:
             st.error(f"Conexão: {e}")
 
