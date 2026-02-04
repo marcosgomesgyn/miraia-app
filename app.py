@@ -3,7 +3,7 @@ import google.generativeai as genai
 from PIL import Image
 import pandas as pd
 
-# 1. ESTILO "DARK MODE" PROFISSIONAL
+# 1. CONFIGURAÇÃO E ESTILO (CORRIGIDO)
 st.set_page_config(page_title="Vozia - MiraIA", layout="wide")
 
 st.markdown("""
@@ -15,7 +15,7 @@ st.markdown("""
     }
     .stTextInput>div>div>input { background-color: #262730; color: white; border-radius: 5px; }
     </style>
-    """, unsafe_allow_stdio=True)
+    """, unsafe_allow_html=True) # <-- O segredo era 'html' aqui!
 
 # 2. INICIALIZAÇÃO DA AGENDA
 if 'agenda' not in st.session_state:
@@ -28,9 +28,10 @@ api_key = st.sidebar.text_input("Cole sua API Key aqui:", type="password")
 if api_key:
     try:
         genai.configure(api_key=api_key)
-        # Forçamos o modelo sem prefixos para evitar o 404
+        # Usamos o nome puro para evitar o erro 404 da v1beta
         model = genai.GenerativeModel('gemini-1.5-flash')
         
+        # --- ÁREA DE COMANDO ---
         st.subheader("🎤 O que o Omni deve fazer?")
         comando = st.text_input("Comando:", value="Agendar live no Instagram quarta às 19h")
         arquivo = st.file_uploader("Suba um Print ou Foto", type=['png', 'jpg', 'jpeg'])
@@ -45,7 +46,7 @@ if api_key:
                         img = Image.open(arquivo)
                         conteudo.append(img)
                     
-                    # A CHAMADA PURA (O Google decide a versão v1 automaticamente)
+                    # Chamada direta
                     response = model.generate_content(conteudo)
                     
                     if response.text:
@@ -58,4 +59,4 @@ if api_key:
         st.session_state.agenda = st.data_editor(st.session_state.agenda, num_rows="dynamic", use_container_width=True)
 
     except Exception as e:
-        st.error(f"Erro de conexão: {e}")
+        st.error(f"Erro: {e}")
