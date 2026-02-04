@@ -30,6 +30,7 @@ if api_key:
     try:
         genai.configure(api_key=api_key)
         # NOME ABSOLUTO: O padrão que resolve o erro 404
+        
         model = genai.GenerativeModel('models/gemini-1.5-flash')
                 
         st.subheader("⚡ Ação Rápida")
@@ -84,4 +85,5 @@ st.session_state.agenda = st.data_editor(st.session_state.agenda, num_rows="dyna
 
 st.markdown("---")
 st.caption("MiraAI v2.0 - Tecnologia Omni Digital")
+
 
