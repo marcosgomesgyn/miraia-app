@@ -4,7 +4,7 @@ from PIL import Image
 import pandas as pd
 from audio_recorder_streamlit import audio_recorder
 
-# 1. DESIGN EXTRAORDINÁRIO (Ajustado para Mobile e Desktop)
+# 1. DESIGN EXTRAORDINÁRIO
 st.set_page_config(page_title="MiraAI - Gestão Inteligente", layout="wide")
 st.markdown("""
     <style>
@@ -29,14 +29,13 @@ api_key = st.sidebar.text_input("Cole sua API Key aqui:", type="password")
 if api_key:
     try:
         genai.configure(api_key=api_key)
-        # O motor 2.0 que sua chave já confirmou ter acesso [cite: 2026-02-04]
         model = genai.GenerativeModel('gemini-2.0-flash')
         
         st.subheader("⚡ Ação Rápida")
         col_audio, col_txt, col_file = st.columns([0.6, 2, 1])
         
         with col_audio:
-            # Componente de voz otimizado [cite: 2026-02-04]
+            # Gravamos o áudio, mas ele não dispara a IA sozinho agora
             audio_bytes = audio_recorder(text="Falar", icon_size="2x", neutral_color="#3b82f6")
         
         with col_txt:
@@ -45,35 +44,32 @@ if api_key:
         with col_file:
             arquivo = st.file_uploader("Subir Print", type=['png', 'jpg', 'jpeg'], label_visibility="collapsed")
 
-        # DISPARO: Só executa se houver áudio OU se clicar no botão
-        botao_executar = st.button("🚀 Executar MiraAI")
-        
-        if botao_executar or audio_bytes:
-            with st.spinner("MiraAI processando sua solicitação..."):
-                # Define a instrução base
-                instrucao = f"Aja como MiraAI. Instrução do usuário: {comando if comando else 'Processar entrada multimodal.'}"
-                conteudo_para_ia = [instrucao]
-                
-                # Adiciona Imagem se houver [cite: 2026-02-04]
-                if arquivo:
-                    img = Image.open(arquivo)
-                    conteudo_para_ia.append(img)
-                
-                # Adiciona Áudio se houver [cite: 2026-02-04]
-                if audio_bytes:
-                    conteudo_para_ia.append({"mime_type": "audio/wav", "data": audio_bytes})
+        # ÚNICO GATILHO: Agora só executa se você clicar no botão
+        if st.button("🚀 Executar MiraAI"):
+            # Verificamos se há algo para processar
+            if comando or arquivo or audio_bytes:
+                with st.spinner("MiraAI processando sua solicitação..."):
+                    instrucao = f"Aja como MiraAI. Instrução do usuário: {comando if comando else 'Analise os dados fornecidos.'}"
+                    conteudo_para_ia = [instrucao]
+                    
+                    if arquivo:
+                        conteudo_para_ia.append(Image.open(arquivo))
+                    
+                    if audio_bytes:
+                        conteudo_para_ia.append({"mime_type": "audio/wav", "data": audio_bytes})
 
-                # Chamada oficial para a API
-                response = model.generate_content(conteudo_para_ia)
-                
-                # Exibição do Resultado
-                st.success("Análise concluída!")
-                st.markdown(f"**Resposta da IA:** {response.text}")
-                
-                # Atualização automática da Agenda
-                texto_tarefa = comando if comando else "Comando via Voz/Imagem"
-                nova_tarefa = pd.DataFrame([{'Prioridade': 'Alta', 'Horário': 'Pendente', 'Tarefa/Evento': texto_tarefa, 'Status': 'Novo'}])
-                st.session_state.agenda = pd.concat([st.session_state.agenda, nova_tarefa], ignore_index=True)
+                    # Chamada para a API
+                    response = model.generate_content(conteudo_para_ia)
+                    
+                    st.success("Análise concluída!")
+                    st.markdown(f"**Resposta da IA:** {response.text}")
+                    
+                    # Atualiza Agenda
+                    texto_tarefa = comando if comando else "Comando Multimodal"
+                    nova_tarefa = pd.DataFrame([{'Prioridade': 'Alta', 'Horário': 'Ver Resposta', 'Tarefa/Evento': texto_tarefa, 'Status': 'Novo'}])
+                    st.session_state.agenda = pd.concat([st.session_state.agenda, nova_tarefa], ignore_index=True)
+            else:
+                st.warning("Por favor, digite algo, fale ou suba uma imagem antes de executar.")
 
     except Exception as e:
         if "429" in str(e):
@@ -88,4 +84,3 @@ st.session_state.agenda = st.data_editor(st.session_state.agenda, num_rows="dyna
 
 st.markdown("---")
 st.caption("MiraAI v2.0 - Tecnologia Omni Digital")
-
