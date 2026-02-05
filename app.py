@@ -87,3 +87,4 @@ st.markdown("---")
 st.caption("MiraAI v2.0 - Tecnologia Omni Digital")
 
 
+
